@@ -4,7 +4,7 @@ import AuthGate from '../components/AuthGate.jsx'
 import RadarChartCard from '../components/RadarChartCard.jsx'
 import { Link } from 'react-router-dom'
 
-const API = '/api/predict'
+const API = 'https://autopersonal.vercel.app/api/predict'
 // https://autopersonal.vercel.app
 
 export default function App(){ return (<AuthGate><Shell /></AuthGate>) }
