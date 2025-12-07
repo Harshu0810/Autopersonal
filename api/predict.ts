@@ -76,7 +76,7 @@ export default async function handler(req: Request) {
       });
 
     let hfRes = await callHF(MODEL_ID);
-    if ([403, 404, 410, 503].includes(hfRes.status)) hfRes = await callHF("Minej/bert-base-personality");
+    if ([403, 404, 410, 503].includes(hfRes.status)) hfRes = await callHF("holistic-ai/personality_classifier");
     if (!hfRes.ok) return json({ error: `HF API error: ${hfRes.status}`, detail: await hfRes.text() }, 502);
 
     const output = await hfRes.json();
