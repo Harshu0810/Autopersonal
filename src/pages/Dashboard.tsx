@@ -50,7 +50,7 @@ export default function Dashboard() {
       const payload: any = { type: mode }
       if (mode === 'text') payload.text = text
       else payload.responses = responses
-      const res = await fetch('https://fmjqpgtnejdycykkrehn.supabase.co/api/predict', {
+      const res = await fetch('api/predict.ts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify(payload)
