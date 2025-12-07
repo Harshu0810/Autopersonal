@@ -69,7 +69,7 @@ export default async function handler(req: Request) {
     }
 
     const callHF = async (m: string) =>
-      fetch(`https://router.huggingface.co/models/${m}`, {
+      fetch(`https://router.huggingface.co/models/holistic-ai/personality_classifier/${m}`, {
         method: "POST",
         headers: { Authorization: `Bearer ${HF_API_TOKEN}`, "Content-Type": "application/json" },
         body: JSON.stringify({ inputs: inputText }),
