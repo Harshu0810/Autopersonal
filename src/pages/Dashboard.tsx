@@ -50,7 +50,7 @@ export default function Dashboard() {
       const payload: any = { type: mode }
       if (mode === 'text') payload.text = text
       else payload.responses = responses
-      const res = await fetch('https://huggingface.co/holistic-ai/personality_classifier', {
+      const res = await fetch('/api/predict', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify(payload)
