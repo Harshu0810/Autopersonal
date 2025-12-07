@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import RadarChart from '../components/RadarChart'
 import { BIG5_ITEMS } from '../lib/big5_items'
-import { FileText, ClipboardList, TrendingUp, Eye } from 'lucide-react'
+import { FileText, ClipboardList, TrendingUp } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 
 type Scores = { O: number; C: number; E: number; A: number; N: number }
@@ -39,20 +39,6 @@ export default function Dashboard() {
       setRecent(preds || [])
     })()
   }, [session])
-
-  const computeSurveyScores = useMemo(() => {
-    const sums: any = { O: 0, C: 0, E: 0, A: 0, N: 0 }
-    const counts: any = { O: 0, C: 0, E: 0, A: 0, N: 0 }
-    BIG5_ITEMS.forEach((item, idx) => {
-      let v = responses[idx]
-      if (item.reverse) v = 6 - v
-      sums[item.trait] += v
-      counts[item.trait]++
-    })
-    const avg: any = {};
-    (['O', 'C', 'E', 'A', 'N'] as const).forEach((k) => (avg[k] = sums[k] / counts[k]))
-    return avg
-  }, [responses])
 
   const analyze = async (mode: 'text' | 'survey') => {
     if (!session) return
