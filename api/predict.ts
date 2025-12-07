@@ -1,7 +1,7 @@
 export const config = { runtime: "edge" };
 
 const OCEAN_KEYS = ["O", "C", "E", "A", "N"];
-const MODEL_ID = process.env.HF_MODEL_ID || "holistic-ai/personality_classifier";
+const MODEL_ID = process.env.HF_MODEL_ID || "https://huggingface.co/holistic-ai/personality_classifier";
 
 const json = (obj: any, status = 200) =>
   new Response(JSON.stringify(obj), {
