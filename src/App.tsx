@@ -1,4 +1,4 @@
-import { PropsWithChildren } from 'react'
+    import { PropsWithChildren } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from './lib/supabase'
 import { LogOut, LayoutDashboard } from 'lucide-react'
@@ -37,7 +37,15 @@ export default function App({ children }: PropsWithChildren) {
                 <LogOut className="w-4 h-4 mr-2" />
                 Sign out
               </button>
+              <button
+                onClick={() => nav('/personality-analysis')}  // 👈 change this path if your page route is different
+                className="flex items-center px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-blue-600 hover:opacity-90 rounded-lg transition"
+                >
+              🔍 Analyze Personality
+              </button>
+
             </div>
+             </div>
           </div>
         </div>
       </nav>
