@@ -75,26 +75,8 @@ export default function Dashboard() {
     score: Math.round(v * 100)
   })) : []
 
-  // return (
-  //   <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 p-6">
-  //     <div className="max-w-7xl mx-auto">
-    return (
-  <div className="flex min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50">
-
-    {/* LEFT SIDE BUTTON */}
-    <div className="w-64 bg-white shadow-lg p-6 flex flex-col">
-      <h2 className="text-2xl font-bold mb-8 text-purple-700">Dashboard</h2>
-
-      <a
-        href="https://195ea772d6613806d7.gradio.live"
-        className="w-full text-center bg-gradient-to-r from-purple-600 to-blue-600 text-white py-3 rounded-xl font-semibold hover:opacity-90 transition"
-      >
-        🔍 Analyze Personality
-      </a>
-    </div>
-
-    {/* MAIN DASHBOARD AREA */}
-    <div className="flex-1 p-6">
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 p-6">
       <div className="max-w-7xl mx-auto">
         <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
           <div className="flex items-center justify-between">
@@ -216,7 +198,6 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
-    </div>
-   </div>     
+    </div>    
   )
 }
