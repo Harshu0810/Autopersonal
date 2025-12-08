@@ -1,5 +1,5 @@
 // ====================
-// FILE: api/predict.ts (FINAL PRODUCTION VERSION)
+// FILE: api/predict.ts (UPDATED WITH NEW HF ENDPOINT)
 // ====================
 export const config = { runtime: 'edge' }
 
@@ -160,14 +160,21 @@ export default async function handler(req: Request) {
       inputText = String(text).slice(0, 4000)
       method = 'text_analysis'
 
-      // Call Hugging Face model
-      const hfRes = await fetch(`https://router.huggingface.co/models/${MODEL_ID}`, {
+      // Call Hugging Face Inference API
+      // Using wait_for_model to handle cold starts automatically
+      const hfRes = await fetch(`https://api-inference.huggingface.co/models/${MODEL_ID}`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${HF_API_TOKEN}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ inputs: inputText }),
+        body: JSON.stringify({ 
+          inputs: inputText,
+          options: { 
+            wait_for_model: true,  // Wait for model to load (max 60s)
+            use_cache: false        // Get fresh predictions
+          }
+        }),
       })
 
       if (!hfRes.ok) {
@@ -177,9 +184,15 @@ export default async function handler(req: Request) {
         // Better error messages for common issues
         if (hfRes.status === 503) {
           return jsonResponse({ 
-            error: 'AI model is loading. Please wait 20 seconds and try again.',
-            retryAfter: 20 
+            error: 'AI model is loading. Please wait 30 seconds and try again.',
+            retryAfter: 30 
           }, 503)
+        }
+        
+        if (hfRes.status === 401 || hfRes.status === 403) {
+          return jsonResponse({ 
+            error: 'Invalid Hugging Face API token. Please check HF_API_TOKEN in Vercel settings.',
+          }, 502)
         }
         
         return jsonResponse({ 
@@ -191,15 +204,24 @@ export default async function handler(req: Request) {
       const output = await hfRes.json()
       
       // Parse model output
-      let vec: any = Array.isArray(output) && Array.isArray(output[0])
-        ? output[0]
-        : Array.isArray(output)
-        ? output
-        : null
+      let vec: any = null
+      
+      // Handle different response formats
+      if (Array.isArray(output)) {
+        if (Array.isArray(output[0])) {
+          vec = output[0] // [[0.1, 0.2, 0.3, 0.4, 0.5]]
+        } else if (output.length >= 5) {
+          vec = output // [0.1, 0.2, 0.3, 0.4, 0.5]
+        }
+      }
 
       if (!vec || vec.length < 5) {
         console.error('Unexpected output:', output)
-        return jsonResponse({ error: 'Unexpected model output format' }, 500)
+        return jsonResponse({ 
+          error: 'Model returned unexpected format. The model may still be loading.',
+          detail: 'Please wait 30 seconds and try again.',
+          raw: output 
+        }, 500)
       }
 
       // Get base scores from model
