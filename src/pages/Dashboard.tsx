@@ -86,7 +86,7 @@ export default function Dashboard() {
       <h2 className="text-2xl font-bold mb-8 text-purple-700">Dashboard</h2>
 
       <a
-        href="/personality-analysis"  // 👈 change this link if your analysis page has a different route
+        href="https://195ea772d6613806d7.gradio.live"
         className="w-full text-center bg-gradient-to-r from-purple-600 to-blue-600 text-white py-3 rounded-xl font-semibold hover:opacity-90 transition"
       >
         🔍 Analyze Personality
