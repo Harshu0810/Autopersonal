@@ -1,5 +1,5 @@
 // ====================
-// FILE: api/predict.ts (UPDATED WITH NEW HF ENDPOINT)
+// FILE: api/predict.ts (HYBRID: Rule-based Text + Survey)
 // ====================
 export const config = { runtime: 'edge' }
 
@@ -35,41 +35,96 @@ const getTopLabel = (scores: Record<string, number>) => {
   return (names as any)[best]
 }
 
-// Enhance scores using linguistic features for better accuracy
-const enhanceScores = (text: string, baseScores: any) => {
+// Advanced linguistic analysis for personality prediction
+const analyzeTextForPersonality = (text: string) => {
   const lower = text.toLowerCase()
-  const words = text.split(/\s+/)
+  const words = text.split(/\s+/).filter(w => w.length > 0)
+  const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0)
   
-  // Calculate linguistic features
   const wordCount = words.length
   const avgWordLength = words.reduce((sum, w) => sum + w.length, 0) / wordCount
+  const avgSentenceLength = wordCount / sentences.length
+  
+  // Personality markers based on linguistic research
+  const markers = {
+    // Openness markers
+    openness: {
+      abstract: (lower.match(/\b(idea|think|theory|concept|imagine|philosophy|creative|art|novel|complex|abstract|wonder|possibility)\b/g) || []).length,
+      intellectual: (lower.match(/\b(learn|study|read|knowledge|understand|analyze|explore|discover|research|science)\b/g) || []).length,
+      creative: (lower.match(/\b(create|design|invent|original|unique|artistic|paint|write|compose|innovate)\b/g) || []).length,
+      curiosity: (lower.match(/\b(why|how|curious|interest|fascinate|explore|discover|new|different)\b/g) || []).length,
+    },
+    
+    // Conscientiousness markers
+    conscientiousness: {
+      organization: (lower.match(/\b(plan|organize|schedule|detail|prepare|order|system|structure|arrange|coordinate)\b/g) || []).length,
+      achievement: (lower.match(/\b(goal|achieve|accomplish|complete|finish|succeed|task|deadline|target|objective)\b/g) || []).length,
+      discipline: (lower.match(/\b(discipline|control|focus|careful|precise|thorough|diligent|responsible|duty)\b/g) || []).length,
+      orderly: (lower.match(/\b(clean|neat|tidy|organized|systematic|methodical|efficient|punctual)\b/g) || []).length,
+    },
+    
+    // Extraversion markers
+    extraversion: {
+      social: (lower.match(/\b(friend|people|party|social|together|group|team|meet|talk|chat|communicate)\b/g) || []).length,
+      energy: (lower.match(/\b(excite|energy|active|enthusiastic|lively|dynamic|vibrant|passionate)\b/g) || []).length,
+      assertive: (lower.match(/\b(lead|direct|confident|assert|speak|voice|opinion|influence|persuade)\b/g) || []).length,
+      gregarious: (lower.match(/\b(we|us|our|everyone|crowd|gathering|company|companionship)\b/g) || []).length,
+    },
+    
+    // Agreeableness markers
+    agreeableness: {
+      empathy: (lower.match(/\b(feel|care|understand|empathy|sympathy|compassion|concern|support|help)\b/g) || []).length,
+      cooperation: (lower.match(/\b(cooperate|collaborate|share|together|team|agree|harmony|peace|unity)\b/g) || []).length,
+      kindness: (lower.match(/\b(kind|nice|gentle|warm|friendly|caring|loving|generous|thoughtful)\b/g) || []).length,
+      trust: (lower.match(/\b(trust|honest|sincere|genuine|true|loyal|reliable|faithful)\b/g) || []).length,
+    },
+    
+    // Neuroticism markers
+    neuroticism: {
+      anxiety: (lower.match(/\b(worry|anxious|nervous|stress|fear|scared|afraid|panic|tense)\b/g) || []).length,
+      negative: (lower.match(/\b(bad|terrible|horrible|awful|hate|dislike|angry|sad|upset|frustrated)\b/g) || []).length,
+      mood: (lower.match(/\b(mood|emotional|feelings|sensitive|hurt|vulnerable|insecure)\b/g) || []).length,
+      instability: (lower.match(/\b(unstable|overwhelm|difficult|struggle|problem|issue|challenge)\b/g) || []).length,
+    },
+  }
+  
+  // Positive emotion words (inversely related to Neuroticism)
+  const positiveWords = (lower.match(/\b(good|great|excellent|wonderful|amazing|happy|joy|love|like|enjoy|pleasant|delightful)\b/g) || []).length
+  
+  // Personal pronouns (related to focus)
+  const firstPerson = (lower.match(/\b(i|me|my|mine|myself)\b/g) || []).length
+  const secondPerson = (lower.match(/\b(you|your|yours|yourself)\b/g) || []).length
+  const thirdPerson = (lower.match(/\b(he|she|they|them|their|his|her)\b/g) || []).length
+  
+  // Punctuation patterns
   const exclamations = (text.match(/!/g) || []).length
   const questions = (text.match(/\?/g) || []).length
   
-  // Count specific word categories
-  const firstPerson = (lower.match(/\b(i|me|my|mine|myself)\b/g) || []).length
-  const socialWords = (lower.match(/\b(we|us|our|together|friend|people|party|social)\b/g) || []).length
-  const negativeWords = (lower.match(/\b(not|never|no|bad|hate|dislike|worry|anxious|stress)\b/g) || []).length
-  const positiveWords = (lower.match(/\b(good|great|love|like|happy|joy|excited|wonderful)\b/g) || []).length
-  const abstractWords = (lower.match(/\b(idea|think|theory|concept|imagine|philosophy|creative)\b/g) || []).length
-  const organizationWords = (lower.match(/\b(plan|organize|schedule|detail|prepare|order|system)\b/g) || []).length
-  
-  // Calculate adjustment factors (small adjustments to avoid overfitting)
-  const adjustments = {
-    E: (socialWords > 2 ? 0.05 : 0) + (firstPerson > 8 ? -0.03 : 0),
-    N: (negativeWords > positiveWords ? 0.06 : -0.04) + (exclamations > 3 ? 0.02 : 0),
-    O: (abstractWords > 2 ? 0.05 : 0) + (avgWordLength > 6 ? 0.03 : 0),
-    C: (organizationWords > 2 ? 0.05 : 0) + (wordCount > 250 ? 0.03 : 0),
-    A: (positiveWords > negativeWords + 2 ? 0.05 : 0) + (questions > 1 ? 0.02 : 0),
+  // Calculate raw scores (0-1 scale)
+  const calculateScore = (categoryMarkers: any, bonus = 0) => {
+    const total = Object.values(categoryMarkers).reduce((sum: number, val: any) => sum + val, 0)
+    const normalized = Math.min(total / wordCount * 50, 1) // Normalize by word count
+    return Math.max(0.2, Math.min(0.8, 0.5 + normalized + bonus))
   }
   
-  // Apply adjustments while keeping scores in valid range
-  const enhanced = { ...baseScores }
-  for (const [trait, adjustment] of Object.entries(adjustments)) {
-    enhanced[trait] = Math.max(0.1, Math.min(0.9, enhanced[trait] + adjustment))
+  // Calculate personality scores
+  const scores = {
+    O: calculateScore(markers.openness, avgWordLength > 6 ? 0.1 : 0),
+    C: calculateScore(markers.conscientiousness, avgSentenceLength > 20 ? 0.1 : 0),
+    E: calculateScore(markers.extraversion, exclamations > 2 ? 0.1 : -0.05),
+    A: calculateScore(markers.agreeableness, positiveWords > wordCount * 0.05 ? 0.1 : 0),
+    N: calculateScore(markers.neuroticism, markers.neuroticism.negative > markers.neuroticism.anxiety ? 0.1 : 0),
   }
   
-  return enhanced
+  // Adjust Neuroticism inversely with positive emotions
+  const positiveRatio = positiveWords / (wordCount || 1)
+  scores.N = Math.max(0.2, Math.min(0.8, scores.N - positiveRatio * 0.5))
+  
+  // Adjust Extraversion based on pronoun usage
+  if (firstPerson > wordCount * 0.1) scores.E -= 0.05 // Too self-focused
+  if (secondPerson > wordCount * 0.05 || thirdPerson > wordCount * 0.05) scores.E += 0.05
+  
+  return scores
 }
 
 export default async function handler(req: Request) {
@@ -94,18 +149,11 @@ export default async function handler(req: Request) {
     const SUPABASE_URL = process.env.SUPABASE_URL
     const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY
     const SUPABASE_SERVICE_ROLE = process.env.SUPABASE_SERVICE_ROLE
-    const HF_API_TOKEN = process.env.HF_API_TOKEN
-    const MODEL_ID = process.env.HF_MODEL_ID || 'Minej/bert-base-personality'
 
     // Validate environment
     if (!SUPABASE_URL || !SUPABASE_ANON_KEY || !SUPABASE_SERVICE_ROLE) {
       console.error('Missing Supabase credentials')
-      return jsonResponse({ error: 'Server configuration error: Missing Supabase credentials' }, 500)
-    }
-
-    if (!HF_API_TOKEN) {
-      console.error('Missing HF_API_TOKEN')
-      return jsonResponse({ error: 'Server configuration error: Missing Hugging Face token' }, 500)
+      return jsonResponse({ error: 'Server configuration error' }, 500)
     }
 
     // Parse request body
@@ -113,7 +161,7 @@ export default async function handler(req: Request) {
     try {
       body = await req.json()
     } catch {
-      return jsonResponse({ error: 'Invalid JSON in request body' }, 400)
+      return jsonResponse({ error: 'Invalid JSON' }, 400)
     }
 
     const { type, text, responses } = body || {}
@@ -123,7 +171,7 @@ export default async function handler(req: Request) {
     const token = auth.startsWith('Bearer ') ? auth.slice(7) : null
 
     if (!token) {
-      return jsonResponse({ error: 'Unauthorized: Missing bearer token' }, 401)
+      return jsonResponse({ error: 'Unauthorized' }, 401)
     }
 
     // Verify user with Supabase
@@ -136,7 +184,7 @@ export default async function handler(req: Request) {
 
     if (!userRes.ok) {
       console.error('Auth failed:', userRes.status)
-      return jsonResponse({ error: 'Invalid authentication token' }, 401)
+      return jsonResponse({ error: 'Invalid token' }, 401)
     }
 
     const user = await userRes.json()
@@ -152,99 +200,33 @@ export default async function handler(req: Request) {
     let method = 'unknown'
 
     if (type === 'text') {
-      // Text analysis path
+      // TEXT ANALYSIS: Use rule-based linguistic analysis
       if (!text || !String(text).trim()) {
         return jsonResponse({ error: 'Text input is empty' }, 400)
       }
       
       inputText = String(text).slice(0, 4000)
-      method = 'text_analysis'
-
-      // Call Hugging Face Inference API
-      // Using wait_for_model to handle cold starts automatically
-      const hfRes = await fetch(`https://api-inference.huggingface.co/models/${MODEL_ID}`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${HF_API_TOKEN}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          inputs: inputText,
-          options: { 
-            wait_for_model: true,  // Wait for model to load (max 60s)
-            use_cache: false        // Get fresh predictions
-          }
-        }),
-      })
-
-      if (!hfRes.ok) {
-        const errorText = await hfRes.text()
-        console.error('HF API error:', hfRes.status, errorText)
-        
-        // Better error messages for common issues
-        if (hfRes.status === 503) {
-          return jsonResponse({ 
-            error: 'AI model is loading. Please wait 30 seconds and try again.',
-            retryAfter: 30 
-          }, 503)
-        }
-        
-        if (hfRes.status === 401 || hfRes.status === 403) {
-          return jsonResponse({ 
-            error: 'Invalid Hugging Face API token. Please check HF_API_TOKEN in Vercel settings.',
-          }, 502)
-        }
-        
-        return jsonResponse({ 
-          error: `AI model error (${hfRes.status})`,
-          detail: errorText.slice(0, 200)
-        }, 502)
-      }
-
-      const output = await hfRes.json()
       
-      // Parse model output
-      let vec: any = null
-      
-      // Handle different response formats
-      if (Array.isArray(output)) {
-        if (Array.isArray(output[0])) {
-          vec = output[0] // [[0.1, 0.2, 0.3, 0.4, 0.5]]
-        } else if (output.length >= 5) {
-          vec = output // [0.1, 0.2, 0.3, 0.4, 0.5]
-        }
-      }
-
-      if (!vec || vec.length < 5) {
-        console.error('Unexpected output:', output)
+      if (inputText.split(/\s+/).length < 50) {
         return jsonResponse({ 
-          error: 'Model returned unexpected format. The model may still be loading.',
-          detail: 'Please wait 30 seconds and try again.',
-          raw: output 
-        }, 500)
+          error: 'Text is too short. Please provide at least 50 words for accurate analysis.',
+          minWords: 50,
+          yourWords: inputText.split(/\s+/).length
+        }, 400)
       }
-
-      // Get base scores from model
-      const baseScores = {
-        O: Number(vec[0]),
-        C: Number(vec[1]),
-        E: Number(vec[2]),
-        A: Number(vec[3]),
-        N: Number(vec[4]),
-      }
-
-      // Enhance with linguistic analysis
-      finalScores = enhanceScores(inputText, baseScores)
+      
+      method = 'linguistic_analysis'
+      finalScores = analyzeTextForPersonality(inputText)
 
     } else if (type === 'survey') {
-      // Survey analysis path (more accurate)
+      // SURVEY ANALYSIS: Direct calculation (most accurate)
       const arr = Array.isArray(responses) ? responses.map((x: any) => Number(x)) : []
       
       if (!arr.length || arr.length < 50) {
         return jsonResponse({ error: 'Survey must have 50 responses' }, 400)
       }
 
-      method = 'survey'
+      method = 'survey_ipip50'
       inputText = 'IPIP-50 Survey Response'
 
       // Calculate scores directly from survey responses
@@ -255,7 +237,7 @@ export default async function handler(req: Request) {
       }
 
       const mean = (xs: number[]) => xs.reduce((a, b) => a + b, 0) / xs.length
-      const normalize = (x: number) => (x - 1) / 4 // Normalize 1-5 scale to 0-1
+      const normalize = (x: number) => (x - 1) / 4
 
       finalScores = {
         O: normalize(mean(buckets.O)),
@@ -310,18 +292,20 @@ export default async function handler(req: Request) {
         percentiles,
         id: inserted?.[0]?.id,
         method,
+        note: method === 'linguistic_analysis' 
+          ? 'Results based on advanced linguistic analysis of your text' 
+          : 'Results based on IPIP-50 standardized survey'
       })
 
     } catch (dbError: any) {
       console.error('Database error:', dbError)
       
-      // Return results even if DB save fails
       return jsonResponse({
         scores: finalScores,
         label,
         percentiles,
         method,
-        warning: 'Results calculated but not saved to database',
+        warning: 'Results calculated but not saved',
       })
     }
 
