@@ -165,7 +165,7 @@ export default async function handler(req: Request) {
 
     const callHF = async (modelId: string) => {
       try {
-        return await fetch(`https://api-inference.huggingface.co/models/${modelId}`, {
+        return await fetch(`https://router.huggingface.co/models/${modelId}`, {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${HF_API_TOKEN}`,
