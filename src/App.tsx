@@ -34,7 +34,7 @@ export default function App({ children }: PropsWithChildren) {
                <div className="flex items-center space-x-3">
                                                                                                    
                 <button
-    onClick={() => window.open('https://f9d1b38d623cc7da13.gradio.live/', '_blank')}
+    onClick={() => window.open('https://baeeafa346db96c8c8.gradio.live/', '_blank')}
     className="flex items-center px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-blue-600 hover:opacity-90 rounded-lg transition"
   >
     🔍 Analyze Personality
