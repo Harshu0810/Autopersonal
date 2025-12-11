@@ -70,26 +70,48 @@ export default function Admin() {
   // Check admin status
   useEffect(() => {
     const checkAdmin = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) {
-        nav('/')
-        return
-      }
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        
+        if (!session) {
+          console.log('No session, redirecting to login')
+          nav('/')
+          return
+        }
 
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('is_admin')
-        .eq('id', session.user.id)
-        .single()
+        console.log('Checking admin status for user:', session.user.email)
 
-      if (!profile?.is_admin) {
-        alert('Access denied: Admin only')
+        const { data: profile, error } = await supabase
+          .from('profiles')
+          .select('is_admin, email')
+          .eq('id', session.user.id)
+          .single()
+
+        console.log('Profile data:', profile)
+        console.log('Profile error:', error)
+
+        if (error) {
+          console.error('Error fetching profile:', error)
+          alert('Error checking admin status. Please try again.')
+          nav('/dashboard')
+          return
+        }
+
+        if (!profile?.is_admin) {
+          console.log('User is not admin')
+          alert('⚠️ Access Denied: Admin privileges required.\n\nYour email: ' + session.user.email)
+          nav('/dashboard')
+          return
+        }
+
+        console.log('User is admin, loading data')
+        setIsAdmin(true)
+        loadData()
+      } catch (err) {
+        console.error('Exception in checkAdmin:', err)
+        alert('Error: ' + err)
         nav('/dashboard')
-        return
       }
-
-      setIsAdmin(true)
-      loadData()
     }
     checkAdmin()
   }, [nav])
