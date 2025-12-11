@@ -1,4 +1,23 @@
-import { useEffect, useMemo, useState } from 'react'
+// At the top of Dashboard component
+useEffect(() => {
+  const checkAdminStatus = async () => {
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session) return
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('is_admin, email')
+      .eq('id', session.user.id)
+      .single()
+
+    console.log('=== ADMIN CHECK ===')
+    console.log('Email:', profile?.email)
+    console.log('Is Admin:', profile?.is_admin)
+    console.log('==================')
+  }
+  checkAdminStatus()
+}, [])
+  import { useEffect, useMemo, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import RadarChart from '../components/RadarChart'
 import { BIG5_ITEMS } from '../lib/big5_items'
