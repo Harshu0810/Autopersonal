@@ -61,7 +61,7 @@ export default function App({ children }: PropsWithChildren) {
                 </button>
               )}
               <button
-    onClick={() => window.open('https://cdbfeb293f2a0ddca7.gradio.live/', '_blank')}
+    onClick={() => window.open('https://f01fa2171a4e6ad807.gradio.live/', '_blank')}
     className="flex items-center px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-blue-600 hover:opacity-90 rounded-lg transition"
   >
     🔍 Analyze Personality
