@@ -185,8 +185,8 @@ Autopersonal/
 │   ├── App.tsx                 # Main app wrapper with navigation
 │   ├── main.tsx                # Application entry point
 │   └── index.css               # Global styles
-├── vercel.json                      # Static assets
-├── tsconfig.node.json                   # Complete database schema
+├── vercel.json                 
+├── tsconfig.node.json          
 ├── package.json
 ├── tsconfig.json
 ├── vite.config.ts
