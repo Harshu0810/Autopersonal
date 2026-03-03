@@ -8,7 +8,7 @@
 [![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?logo=supabase&logoColor=white)](https://supabase.com/)
 [![Vercel](https://img.shields.io/badge/Vercel-000000?logo=vercel&logoColor=white)](https://vercel.com/)
 
-![Dashboard Preview] <img width="1015" height="914" alt="image" src="https://github.com/user-attachments/assets/5d93a32a-d064-4708-b58c-9b7e963dcc03" />
+![Dashboard Preview] <img width="785" height="684" alt="image" src="https://github.com/user-attachments/assets/5d93a32a-d064-4708-b58c-9b7e963dcc03" />
 
 
 ## 📋 Table of Contents
