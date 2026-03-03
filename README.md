@@ -202,62 +202,10 @@ Analyzes personality from text or survey responses.
 
 ---
 
-## 🚀 Deployment
-
-### Deploy to Vercel
-
-1. **Fork this repository**
-
-2. **Import to Vercel**
-   - Go to [vercel.com](https://vercel.com)
-   - Click "New Project"
-   - Import your forked repository
-
-3. **Add environment variables**
-   - In Vercel project settings → Environment Variables
-   - Add all backend variables listed above
-
-4. **Deploy**
-   - Vercel will automatically deploy on push to main branch
-
-### Manual Deployment
-
-```bash
-# Build for production
-npm run build
-
-# Preview production build
-npm run preview
-
-# Deploy to Vercel
-vercel --prod
-```
 
 ---
 
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-### Development Guidelines
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-### Code Style
-
-- Use TypeScript for type safety
-- Follow React best practices
-- Use Tailwind CSS for styling
-- Write meaningful commit messages
-- Add comments for complex logic
-
----
-
-## 🙏 Acknowledgments
+## 🤖 Acknowledgments
 
 - **Big Five Personality Theory** - Based on decades of psychological research
 - **IPIP-50** - International Personality Item Pool
