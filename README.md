@@ -185,12 +185,15 @@ Autopersonal/
 │   ├── App.tsx                 # Main app wrapper with navigation
 │   ├── main.tsx                # Application entry point
 │   └── index.css               # Global styles
-├── public/                      # Static assets
-├── schema.sql                   # Complete database schema
+├── vercel.json                      # Static assets
+├── tsconfig.node.json                   # Complete database schema
 ├── package.json
 ├── tsconfig.json
 ├── vite.config.ts
 ├── tailwind.config.js
+├── vite-env.d.ts
+├── index.html
+├── postcss.config.js
 └── README.md
 ```
 
