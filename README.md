@@ -8,7 +8,7 @@
 [![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?logo=supabase&logoColor=white)](https://supabase.com/)
 [![Vercel](https://img.shields.io/badge/Vercel-000000?logo=vercel&logoColor=white)](https://vercel.com/)
 
-![Dashboard Preview] <img width="585" height="284" alt="image" src="https://github.com/user-attachments/assets/5d93a32a-d064-4708-b58c-9b7e963dcc03" />
+<img width="585" height="284" alt="image" src="https://github.com/user-attachments/assets/5d93a32a-d064-4708-b58c-9b7e963dcc03" />
 
 
 ## 📋 Table of Contents
@@ -66,13 +66,13 @@ The OCEAN Personality Analysis Platform is a modern web application that analyze
 - 🔄 **Real-time Updates** - Dashboard updates automatically as users submit data
 - 🔍 **Advanced Filtering** - Search by user, trait, or input type
 
- ![All users and their predictions Admin Panel] <img width="585" height="284" alt="image" src="https://github.com/user-attachments/assets/778e8c98-4feb-48ef-bfd1-e2e86b616ce3" />
+ <img width="585" height="284" alt="image" src="https://github.com/user-attachments/assets/778e8c98-4feb-48ef-bfd1-e2e86b616ce3" />
  
 - 📊 **Real-time Analytics** - Live dashboard with statistics and trends
 - 🥧 **Interactive Charts** - Personality distribution, average scores, activity timeline
 - 🎨 **Modern UI** - Beautiful, gradient-based design with smooth animations
-
-![Admin Dashboard] <img width="585" height="284" alt="image" src="https://github.com/user-attachments/assets/a8ae2454-747e-4b42-bf3c-da3ef8c100ef" />
+ 
+<img width="585" height="284" alt="image" src="https://github.com/user-attachments/assets/a8ae2454-747e-4b42-bf3c-da3ef8c100ef" />
 
 ---
 
